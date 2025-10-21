@@ -123,7 +123,7 @@ async def create_note(
     calendar_type: str = Form("solar"),
     enable_notification: bool = Form(False),
     notification_days: int = Form(3),
-    yearly_repeat: bool = Form(False),
+    repeat_type: str = Form("none"),
     db: Session = Depends(get_db)
 ):
     """Create a new note"""
@@ -137,6 +137,10 @@ async def create_note(
         # Parse date
         note_date = datetime.strptime(solar_date, '%Y-%m-%d').date()
         
+        # Determine repeat settings
+        yearly_repeat = (repeat_type == "yearly") if enable_notification else False
+        monthly_repeat = (repeat_type == "monthly") if enable_notification else False
+        
         # Create note
         note = Note(
             user_id=current_user.id,
@@ -146,7 +150,8 @@ async def create_note(
             calendar_type=CalendarType(calendar_type),
             enable_notification=enable_notification,
             notification_days_before=notification_days if enable_notification else 0,
-            yearly_repeat=yearly_repeat if enable_notification else False
+            yearly_repeat=yearly_repeat,
+            monthly_repeat=monthly_repeat
         )
         
         # If lunar calendar type, convert to solar date
@@ -172,7 +177,11 @@ async def create_note(
         
         if is_htmx and "/notes" in referer and "modal" in hx_target:
             # HTMX request from notes page modal - return success message and trigger reload
-            repeat_info = " (Lặp hàng năm)" if yearly_repeat else ""
+            repeat_info = ""
+            if monthly_repeat:
+                repeat_info = " (Lặp hàng tháng)"
+            elif yearly_repeat:
+                repeat_info = " (Lặp hàng năm)"
             success_html = f"""
             <div class="p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg mb-4">
                 <div class="flex items-center">
@@ -288,7 +297,7 @@ async def update_note(
     calendar_type: str = Form("solar"),
     enable_notification: bool = Form(False),
     notification_days: int = Form(3),
-    yearly_repeat: bool = Form(False),
+    repeat_type: str = Form("none"),
     db: Session = Depends(get_db)
 ):
     """Update a note"""
@@ -300,6 +309,10 @@ async def update_note(
         # Parse date
         note_date = datetime.strptime(solar_date, '%Y-%m-%d').date()
         
+        # Determine repeat settings
+        yearly_repeat = (repeat_type == "yearly") if enable_notification else False
+        monthly_repeat = (repeat_type == "monthly") if enable_notification else False
+        
         # Update note
         note.title = title
         note.content = content
@@ -307,7 +320,8 @@ async def update_note(
         note.calendar_type = CalendarType(calendar_type)
         note.enable_notification = enable_notification
         note.notification_days_before = notification_days if enable_notification else 0
-        note.yearly_repeat = yearly_repeat if enable_notification else False
+        note.yearly_repeat = yearly_repeat
+        note.monthly_repeat = monthly_repeat
         
         db.commit()
         
@@ -323,6 +337,12 @@ async def update_note(
             notification_service.create_notification_schedule_for_note(db, note)
         
         # Return success message for HTMX and reload list
+        repeat_info = ""
+        if monthly_repeat:
+            repeat_info = " (Lặp hàng tháng)"
+        elif yearly_repeat:
+            repeat_info = " (Lặp hàng năm)"
+        
         success_html = f"""
         <div class="p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg mb-4">
             <div class="flex items-center">
@@ -330,7 +350,7 @@ async def update_note(
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
                 ✅ Đã cập nhật ghi chú '{note.title}' thành công!
-                {f" (Thông báo từ {notification_days} ngày trước)" if enable_notification else ""}
+                {f" (Thông báo từ {notification_days} ngày trước{repeat_info})" if enable_notification else ""}
             </div>
         </div>
         <script>

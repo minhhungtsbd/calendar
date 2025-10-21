@@ -16,6 +16,7 @@ class NotificationSchedule(Base):
     notifications_sent = Column(Integer, default=0)  # Số thông báo đã gửi
     current_days_before = Column(Integer, nullable=False)  # Ngày hiện tại cần thông báo
     current_year = Column(Integer, nullable=False)  # Năm hiện tại của schedule (cho yearly repeat)
+    current_month = Column(Integer, nullable=False)  # Tháng hiện tại của schedule (cho monthly repeat)
     
     # Status
     is_completed = Column(Boolean, default=False)  # Đã hoàn thành tất cả thông báo
@@ -29,7 +30,7 @@ class NotificationSchedule(Base):
     note = relationship("Note", backref="notification_schedule")
     
     def __repr__(self):
-        return f"<NotificationSchedule(note_id={self.note_id}, sent={self.notifications_sent}/{self.total_notifications_needed}, year={self.current_year})>"
+        return f"<NotificationSchedule(note_id={self.note_id}, sent={self.notifications_sent}/{self.total_notifications_needed}, {self.current_year}/{self.current_month:02d})>"
     
     @property
     def remaining_notifications(self):

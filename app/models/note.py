@@ -27,6 +27,7 @@ class Note(Base):
     enable_notification = Column(Boolean, default=True)
     notification_days_before = Column(Integer, default=3)  # Số ngày thông báo trước (VD: 5 = thông báo từ 5 ngày trước đến ngày sự kiện)
     yearly_repeat = Column(Boolean, default=False)  # Lặp lại hàng năm
+    monthly_repeat = Column(Boolean, default=False)  # Lặp lại hàng tháng
     
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())

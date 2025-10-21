@@ -107,21 +107,56 @@
                     Ví dụ: 5 sẽ nhắc từ 5 ngày trước đến ngày sự kiện (tổng 6 thông báo)
                 </p>
                 
-                <!-- Yearly Repeat Option -->
-                <div class="flex items-center mt-3">
-                    <input type="checkbox" 
-                           id="yearly_repeat" 
-                           name="yearly_repeat" 
-                           value="true"
-                           {% if note and note.yearly_repeat %}checked{% endif %}
-                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
-                    <label for="yearly_repeat" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        🔄 Lặp lại hàng năm
+                <!-- Repeat Options -->
+                <div class="mt-4 space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tùy chọn lặp lại
                     </label>
+                    
+                    <!-- Monthly Repeat Option -->
+                    <div class="flex items-center">
+                        <input type="radio" 
+                               id="monthly_repeat" 
+                               name="repeat_type" 
+                               value="monthly"
+                               {% if note and note.monthly_repeat %}checked{% endif %}
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600">
+                        <label for="monthly_repeat" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                            📅 Lặp lại hàng tháng
+                        </label>
+                    </div>
+                    
+                    <!-- Yearly Repeat Option -->
+                    <div class="flex items-center">
+                        <input type="radio" 
+                               id="yearly_repeat" 
+                               name="repeat_type" 
+                               value="yearly"
+                               {% if note and note.yearly_repeat %}checked{% endif %}
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600">
+                        <label for="yearly_repeat" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                            🔄 Lặp lại hàng năm
+                        </label>
+                    </div>
+                    
+                    <!-- No Repeat Option -->
+                    <div class="flex items-center">
+                        <input type="radio" 
+                               id="no_repeat" 
+                               name="repeat_type" 
+                               value="none"
+                               {% if not note or (not note.yearly_repeat and not note.monthly_repeat) %}checked{% endif %}
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600">
+                        <label for="no_repeat" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                            ❌ Không lặp lại
+                        </label>
+                    </div>
+                    
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        📅 <strong>Hàng tháng:</strong> Lặp lại mỗi tháng vào cùng ngày<br>
+                        🔄 <strong>Hàng năm:</strong> Lặp lại mỗi năm vào cùng ngày tháng
+                    </p>
                 </div>
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Sau khi hoàn thành thông báo, sẽ tự động chuyển sang năm tiếp theo
-                </p>
             </div>
         </div>
         

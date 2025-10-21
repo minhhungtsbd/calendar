@@ -45,6 +45,7 @@ class NotificationService:
             notifications_sent=0,
             current_days_before=note.notification_days_before,
             current_year=note.solar_date.year,  # Track current year for yearly repeat
+            current_month=note.solar_date.month,  # Track current month for monthly repeat
             is_completed=False
         )
         
@@ -67,11 +68,24 @@ class NotificationService:
         for schedule in schedules:
             note = schedule.note
             
-            # Calculate the event date for current year
-            event_date_this_year = note.solar_date.replace(year=schedule.current_year)
+            # Calculate the event date for current year/month
+            try:
+                event_date_this_period = note.solar_date.replace(
+                    year=schedule.current_year,
+                    month=schedule.current_month
+                )
+            except ValueError:
+                # Handle invalid dates (e.g., 31st of Feb)
+                from calendar import monthrange
+                last_day = monthrange(schedule.current_year, schedule.current_month)[1]
+                event_date_this_period = note.solar_date.replace(
+                    year=schedule.current_year,
+                    month=schedule.current_month,
+                    day=min(note.solar_date.day, last_day)
+                )
             
             # Calculate when this notification should be sent
-            notification_date = event_date_this_year - timedelta(days=schedule.current_days_before)
+            notification_date = event_date_this_period - timedelta(days=schedule.current_days_before)
             
             # Parse notification time
             try:
@@ -137,7 +151,17 @@ class NotificationService:
                 logger.info(f"➡️ Schedule {schedule.id}: Next {schedule.current_days_before}d")
             else:
                 # Completed current cycle
-                if note.yearly_repeat:
+                if note.monthly_repeat:
+                    # Reset for next month
+                    schedule.current_month += 1
+                    if schedule.current_month > 12:
+                        schedule.current_month = 1
+                        schedule.current_year += 1
+                    schedule.current_days_before = note.notification_days_before
+                    schedule.notifications_sent = 0
+                    schedule.is_completed = False
+                    logger.info(f"🔄 Schedule {schedule.id}: Reset for {schedule.current_year}/{schedule.current_month:02d}")
+                elif note.yearly_repeat:
                     # Reset for next year
                     schedule.current_year += 1
                     schedule.current_days_before = note.notification_days_before
@@ -160,15 +184,29 @@ class NotificationService:
             note = schedule.note
             user = note.user
             
-            # Calculate event date for current year
-            event_date_this_year = note.solar_date.replace(year=schedule.current_year)
-            lunar_info = LunarCalendarService.get_lunar_info(event_date_this_year)
+            # Calculate event date for current year/month
+            try:
+                event_date_this_period = note.solar_date.replace(
+                    year=schedule.current_year,
+                    month=schedule.current_month
+                )
+            except ValueError:
+                # Handle invalid dates
+                from calendar import monthrange
+                last_day = monthrange(schedule.current_year, schedule.current_month)[1]
+                event_date_this_period = note.solar_date.replace(
+                    year=schedule.current_year,
+                    month=schedule.current_month,
+                    day=min(note.solar_date.day, last_day)
+                )
+            
+            lunar_info = LunarCalendarService.get_lunar_info(event_date_this_period)
             
             # Get personalized feng shui if user has birth date
             feng_shui_content = ""
             if user.birth_date:
                 personal_feng_shui = FengShuiService.get_personal_feng_shui_advice(
-                    user.birth_date, event_date_this_year
+                    user.birth_date, event_date_this_period
                 )
                 
                 # Check for birthday
@@ -185,7 +223,7 @@ class NotificationService:
 • Lời khuyên: {personal_feng_shui['personal_advice']['overall_advice']}{birthday_msg}"""
             else:
                 # General feng shui analysis
-                feng_shui_analysis = FengShuiService.get_daily_feng_shui_analysis(event_date_this_year)
+                feng_shui_analysis = FengShuiService.get_daily_feng_shui_analysis(event_date_this_period)
                 feng_shui_content = f"""🔮 Phong thủy:
 • Can Chi: {feng_shui_analysis['can_chi']}
 • Ngũ hành: {feng_shui_analysis['element'].value}
@@ -198,9 +236,14 @@ class NotificationService:
             else:
                 time_msg = f"⏰ Thông báo trước {schedule.current_days_before} ngày - Còn {schedule.current_days_before} ngày nữa!"
             
-            # Add yearly repeat info
+            # Add repeat info
             repeat_info = ""
-            if note.yearly_repeat:
+            if note.monthly_repeat:
+                if schedule.current_year != note.solar_date.year or schedule.current_month != note.solar_date.month:
+                    repeat_info = f"\n📅 Lặp lại hàng tháng - {schedule.current_year}/{schedule.current_month:02d}"
+                else:
+                    repeat_info = f"\n📅 Sẽ lặp lại hàng tháng"
+            elif note.yearly_repeat:
                 if schedule.current_year != note.solar_date.year:
                     repeat_info = f"\n🔄 Lặp lại hàng năm - Năm {schedule.current_year}"
                 else:
@@ -210,7 +253,7 @@ class NotificationService:
 
 📝 Nội dung: {note.content or ""}
 
-📅 Ngày dương: {event_date_this_year.strftime('%d/%m/%Y')}
+📅 Ngày dương: {event_date_this_period.strftime('%d/%m/%Y')}
 🌙 Ngày âm: {lunar_info['lunar_date_str']}
 
 {feng_shui_content}
@@ -253,8 +296,21 @@ class NotificationService:
             msg['Subject'] = subject
             
             # Get lunar info and feng shui analysis
-            event_date_this_year = note.solar_date.replace(year=schedule.current_year)
-            lunar_info = LunarCalendarService.get_lunar_info(event_date_this_year)
+            try:
+                event_date_this_period = note.solar_date.replace(
+                    year=schedule.current_year,
+                    month=schedule.current_month
+                )
+            except ValueError:
+                from calendar import monthrange
+                last_day = monthrange(schedule.current_year, schedule.current_month)[1]
+                event_date_this_period = note.solar_date.replace(
+                    year=schedule.current_year,
+                    month=schedule.current_month,
+                    day=min(note.solar_date.day, last_day)
+                )
+            
+            lunar_info = LunarCalendarService.get_lunar_info(event_date_this_period)
             
             # Get personalized feng shui if user has birth date
             feng_shui_data = None
@@ -262,7 +318,7 @@ class NotificationService:
             
             if user.birth_date:
                 personal_feng_shui = FengShuiService.get_personal_feng_shui_advice(
-                    user.birth_date, event_date_this_year
+                    user.birth_date, event_date_this_period
                 )
                 feng_shui_data = personal_feng_shui
                 
@@ -272,7 +328,7 @@ class NotificationService:
                     birthday_msg = f"\n🎉 {personal_feng_shui['birthday_reminder']['message']}"
                 
                 feng_shui_summary = f"""
-🔮 Phong thủy cá nhân ngày {event_date_this_year.strftime('%d/%m/%Y')}:
+🔮 Phong thủy cá nhân ngày {event_date_this_period.strftime('%d/%m/%Y')}:
 - Mệnh: {personal_feng_shui['user_info']['birth_year_element']} ({personal_feng_shui['user_info']['birth_year_desc']})
 - Can Chi ngày: {personal_feng_shui['day_info']['can_chi']}
 - Tương thích: {personal_feng_shui['compatibility']['level']} ({personal_feng_shui['compatibility']['score']}/100)
@@ -281,11 +337,11 @@ class NotificationService:
 - Lời khuyên: {personal_feng_shui['personal_advice']['overall_advice']}{birthday_msg}
                 """.strip()
             else:
-                feng_shui_analysis = FengShuiService.get_daily_feng_shui_analysis(event_date_this_year)
+                feng_shui_analysis = FengShuiService.get_daily_feng_shui_analysis(event_date_this_period)
                 feng_shui_data = feng_shui_analysis
                 
                 feng_shui_summary = f"""
-🔮 Phong thủy ngày {event_date_this_year.strftime('%d/%m/%Y')}:
+🔮 Phong thủy ngày {event_date_this_period.strftime('%d/%m/%Y')}:
 - Can Chi: {feng_shui_analysis['can_chi']}
 - Ngũ hành: {feng_shui_analysis['element'].value}
 - Màu may mắn: {', '.join(feng_shui_analysis['lucky_colors'][:3])}
@@ -307,7 +363,7 @@ Xin chào!
 Tiêu đề: {note.title}
 Nội dung: {note.content or ""}
 
-Ngày dương: {event_date_this_year.strftime('%d/%m/%Y')}
+Ngày dương: {event_date_this_period.strftime('%d/%m/%Y')}
 Ngày âm: {lunar_info['lunar_date_str']}
 
 {feng_shui_summary}
@@ -332,7 +388,7 @@ Hệ thống Calendar
                 html_body = template.render(
                     note_title=note.title,
                     note_content=note.content or "",
-                    solar_date=event_date_this_year.strftime('%d/%m/%Y'),
+                    solar_date=event_date_this_period.strftime('%d/%m/%Y'),
                     lunar_date=lunar_info['lunar_date_str'],
                     days_before=schedule.current_days_before,
                     progress=f"{schedule.notifications_sent + 1}/{schedule.total_notifications_needed}",
