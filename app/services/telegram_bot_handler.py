@@ -822,7 +822,6 @@ Cần hỗ trợ? Liên hệ: support@example.com
                 ],
             },
             fallbacks=[CommandHandler("cancel", self.cancel_command)],
-            per_message=True,
             per_chat=True,
             per_user=True,
         )
@@ -853,13 +852,22 @@ Cần hỗ trợ? Liên hệ: support@example.com
             logger.error("Telegram bot token not configured")
             return
         
-        # Tạo application với custom base_url
-        self.application = (
-            Application.builder()
-            .token(self.bot_token)
-            .base_url(f"{self.api_url}/bot")
-            .build()
-        )
+        # Tạo application
+        # Nếu proxy không hoạt động, sử dụng default API
+        builder = Application.builder().token(self.bot_token)
+        
+        # Thử dùng proxy nếu có, nếu không thì dùng default
+        if self.api_url and "tele-api" in self.api_url:
+            logger.info(f"Using custom API URL: {self.api_url}")
+            builder.base_url(f"{self.api_url}/bot")
+        else:
+            logger.info("Using default Telegram API")
+        
+        # Thêm timeout lớn hơn
+        builder.connect_timeout(30.0)
+        builder.read_timeout(30.0)
+        
+        self.application = builder.build()
         
         # Setup handlers
         self.setup_handlers(self.application)
