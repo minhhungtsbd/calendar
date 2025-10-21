@@ -3,7 +3,6 @@
 Script để chạy Telegram Bot
 Chạy: python run_telegram_bot.py
 """
-import asyncio
 import logging
 from app.services.telegram_bot_handler import TelegramBotHandler
 from app.config import settings
@@ -16,7 +15,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def main():
+def main():
     """Main function"""
     logger.info("🚀 Starting Telegram Bot...")
     
@@ -30,12 +29,12 @@ async def main():
     
     # Create and run bot
     bot_handler = TelegramBotHandler()
-    await bot_handler.run_polling()
+    bot_handler.run_polling()
 
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        main()
     except KeyboardInterrupt:
         logger.info("\n🛑 Bot stopped by user")
     except Exception as e:

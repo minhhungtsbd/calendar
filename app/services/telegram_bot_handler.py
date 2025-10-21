@@ -822,6 +822,9 @@ Cần hỗ trợ? Liên hệ: support@example.com
                 ],
             },
             fallbacks=[CommandHandler("cancel", self.cancel_command)],
+            per_message=True,
+            per_chat=True,
+            per_user=True,
         )
         
         application.add_handler(add_note_handler)
@@ -844,7 +847,7 @@ Cần hỗ trợ? Liên hệ: support@example.com
         
         logger.info("✅ Telegram bot handlers setup complete")
     
-    async def run_polling(self):
+    def run_polling(self):
         """Chạy bot với polling mode"""
         if not self.bot_token:
             logger.error("Telegram bot token not configured")
@@ -861,14 +864,12 @@ Cần hỗ trợ? Liên hệ: support@example.com
         # Setup handlers
         self.setup_handlers(self.application)
         
-        # Start polling
+        # Start polling - run_polling tự quản lý event loop
         logger.info("🚀 Starting Telegram bot (polling mode)...")
-        await self.application.run_polling()
+        self.application.run_polling()
 
 
 def main():
     """Main entry point cho bot"""
-    import asyncio
-    
     handler = TelegramBotHandler()
-    asyncio.run(handler.run_polling())
+    handler.run_polling()
