@@ -32,7 +32,11 @@ TELEGRAM_API_URL=https://tele-api.cloudmini.net
 6. Nhấn **Lưu cài đặt**
 7. Quay lại bot và thử các chức năng
 
-> 📖 **Chi tiết:** Xem [TELEGRAM_USER_LINKING.md](./TELEGRAM_USER_LINKING.md) để hiểu cơ chế liên kết tài khoản và hướng dẫn triển khai.
+**Cơ chế hoạt động:**
+- Bot lưu `telegram_chat_id` vào database (bảng `users`)
+- Khi user chat với bot → bot kiểm tra `telegram_chat_id` trong database
+- Nếu chưa link → bot yêu cầu user vào website để nhập ID
+- Sau khi link → mọi thao tác trên bot đều dùng account đã link
 
 ## Chạy Bot
 
@@ -320,6 +324,119 @@ cat /var/www/calendar/.env | grep DATABASE_URL
 - 🔒 Bot chỉ xử lý tin nhắn từ user đã liên kết
 - 🛡️ Dữ liệu được mã hóa trong database
 - 🚫 Bot không lưu trữ tin nhắn
+
+## 🔧 Triển khai Settings Page (cho Dev)
+
+### Thêm route `/settings/telegram`
+
+```python
+# app/routes/settings.py
+from flask import render_template, request, flash, redirect, url_for
+from flask_login import login_required, current_user
+from app.database import SessionLocal
+from app.models.user import User
+
+@app.route('/settings/telegram', methods=['GET', 'POST'])
+@login_required
+def telegram_settings():
+    if request.method == 'POST':
+        telegram_id = request.form.get('telegram_chat_id', '').strip()
+        
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.id == current_user.id).first()
+            
+            if telegram_id:
+                # Kiểm tra ID đã được dùng chưa
+                existing = db.query(User).filter(
+                    User.telegram_chat_id == telegram_id,
+                    User.id != current_user.id
+                ).first()
+                
+                if existing:
+                    flash('❌ Telegram ID này đã được liên kết với tài khoản khác!', 'danger')
+                else:
+                    user.telegram_chat_id = telegram_id
+                    user.telegram_notifications = True
+                    db.commit()
+                    flash('✅ Đã liên kết Telegram thành công!', 'success')
+            else:
+                # Xóa liên kết
+                user.telegram_chat_id = None
+                user.telegram_notifications = False
+                db.commit()
+                flash('ℹ️ Đã hủy liên kết Telegram', 'info')
+        
+        except Exception as e:
+            db.rollback()
+            flash(f'❌ Lỗi: {str(e)}', 'danger')
+        finally:
+            db.close()
+        
+        return redirect(url_for('telegram_settings'))
+    
+    return render_template('settings/telegram.html')
+```
+
+### Template `templates/settings/telegram.html`
+
+```html
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>⚙️ Cài đặt Telegram Bot</h2>
+    
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5>🔗 Liên kết tài khoản Telegram</h5>
+            
+            <div class="alert alert-info">
+                <strong>📱 Cách lấy Telegram ID:</strong>
+                <ol>
+                    <li>Mở Telegram và tìm bot</li>
+                    <li>Gửi lệnh <code>/start</code></li>
+                    <li>Bot sẽ hiển thị Telegram ID của bạn</li>
+                    <li>Copy ID và dán vào ô bên dưới</li>
+                </ol>
+            </div>
+            
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="telegram_chat_id" class="form-label">Telegram ID</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="telegram_chat_id"
+                        name="telegram_chat_id"
+                        value="{{ current_user.telegram_chat_id or '' }}"
+                        placeholder="Ví dụ: 123456789"
+                    >
+                </div>
+                
+                {% if current_user.telegram_chat_id %}
+                <div class="alert alert-success">
+                    ✅ Đã liên kết với Telegram ID: <code>{{ current_user.telegram_chat_id }}</code>
+                </div>
+                {% endif %}
+                
+                <button type="submit" class="btn btn-primary">💾 Lưu cài đặt</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+```
+
+## ❓ FAQ
+
+**Q: Một Telegram ID có thể link nhiều tài khoản không?**  
+A: Không, để bảo mật mỗi ID chỉ link 1 account.
+
+**Q: User quên Telegram ID của mình?**  
+A: Gửi `/start` cho bot, bot sẽ hiển thị ID.
+
+**Q: User đổi Telegram account thì sao?**  
+A: Vào web Settings, xóa ID cũ và nhập ID mới.
 
 ## Tính năng sắp có
 
