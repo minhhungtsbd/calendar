@@ -245,6 +245,271 @@ server {
 }
 ```
 
+### 🔧 Systemd Services (Production)
+
+#### 1. Tạo systemd service files
+
+Tạo user và thư mục:
+```bash
+sudo useradd -m -s /bin/bash calendar
+sudo mkdir -p /var/www/calendar
+sudo chown calendar:calendar /var/www/calendar
+```
+
+**Web Service** (`/etc/systemd/system/calendar-web.service`):
+```ini
+[Unit]
+Description=Calendar FastAPI Web Application
+After=network.target mysql.service redis.service
+Wants=mysql.service redis.service
+
+[Service]
+Type=simple
+User=calendar
+Group=calendar
+WorkingDirectory=/var/www/calendar
+Environment=PATH=/var/www/calendar/venv/bin
+Environment=PYTHONPATH=/var/www/calendar
+EnvironmentFile=/var/www/calendar/.env
+ExecStart=/var/www/calendar/venv/bin/python /var/www/calendar/run.py
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+TimeoutStartSec=30
+TimeoutStopSec=10
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/www/calendar/logs /tmp
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=calendar-web
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Celery Worker Service** (`/etc/systemd/system/calendar-worker.service`):
+```ini
+[Unit]
+Description=Calendar Celery Worker
+After=network.target mysql.service redis.service
+Wants=mysql.service redis.service
+
+[Service]
+Type=simple
+User=calendar
+Group=calendar
+WorkingDirectory=/var/www/calendar
+Environment=PATH=/var/www/calendar/venv/bin
+Environment=PYTHONPATH=/var/www/calendar
+Environment=C_FORCE_ROOT=1
+EnvironmentFile=/var/www/calendar/.env
+ExecStart=/var/www/calendar/venv/bin/celery -A app.tasks.notification_tasks worker --loglevel=info --concurrency=2
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+TimeoutStartSec=30
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/www/calendar/logs /tmp
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=calendar-worker
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Celery Beat Service** (`/etc/systemd/system/calendar-beat.service`):
+```ini
+[Unit]
+Description=Calendar Celery Beat Scheduler
+After=network.target mysql.service redis.service
+Wants=mysql.service redis.service
+
+[Service]
+Type=simple
+User=calendar
+Group=calendar
+WorkingDirectory=/var/www/calendar
+Environment=PATH=/var/www/calendar/venv/bin
+Environment=PYTHONPATH=/var/www/calendar
+Environment=C_FORCE_ROOT=1
+EnvironmentFile=/var/www/calendar/.env
+ExecStart=/var/www/calendar/venv/bin/celery -A app.tasks.notification_tasks beat --loglevel=info --pidfile=/var/www/calendar/celerybeat.pid
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+TimeoutStartSec=30
+TimeoutStopSec=10
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/www/calendar/logs /var/www/calendar /tmp
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=calendar-beat
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### 2. Kích hoạt và khởi động services
+```bash
+# Reload systemd daemon
+sudo systemctl daemon-reload
+
+# Enable services (tự động chạy khi khởi động)
+sudo systemctl enable calendar-web calendar-worker calendar-beat
+
+# Start services
+sudo systemctl start calendar-web calendar-worker calendar-beat
+```
+
+#### 3. Quản lý Services
+
+**Khởi động services:**
+```bash
+sudo systemctl start calendar-web
+sudo systemctl start calendar-worker
+sudo systemctl start calendar-beat
+
+# Hoặc khởi động tất cả cùng lúc
+sudo systemctl start calendar-web calendar-worker calendar-beat
+```
+
+**Dừng services:**
+```bash
+sudo systemctl stop calendar-web
+sudo systemctl stop calendar-worker
+sudo systemctl stop calendar-beat
+
+# Hoặc dừng tất cả cùng lúc
+sudo systemctl stop calendar-web calendar-worker calendar-beat
+```
+
+**Khởi động lại services:**
+```bash
+sudo systemctl restart calendar-web
+sudo systemctl restart calendar-worker
+sudo systemctl restart calendar-beat
+
+# Hoặc restart tất cả cùng lúc
+sudo systemctl restart calendar-web calendar-worker calendar-beat
+```
+
+**Reload services (không gián đoạn):**
+```bash
+sudo systemctl reload calendar-web
+sudo systemctl reload calendar-worker
+sudo systemctl reload calendar-beat
+```
+
+**Kiểm tra trạng thái:**
+```bash
+# Kiểm tra từng service
+sudo systemctl status calendar-web
+sudo systemctl status calendar-worker
+sudo systemctl status calendar-beat
+
+# Kiểm tra tất cả services
+sudo systemctl status calendar-*
+```
+
+#### 4. Xem Logs
+
+**Xem log real-time:**
+```bash
+# Xem log của web service
+sudo journalctl -u calendar-web -f
+
+# Xem log của worker
+sudo journalctl -u calendar-worker -f
+
+# Xem log của beat scheduler
+sudo journalctl -u calendar-beat -f
+
+# Xem log của tất cả services
+sudo journalctl -u calendar-* -f
+```
+
+**Xem log từ thời điểm cụ thể:**
+```bash
+# Log 100 dòng cuối
+sudo journalctl -u calendar-web -n 100
+
+# Log từ hôm nay
+sudo journalctl -u calendar-web --since today
+
+# Log từ 1 giờ trước
+sudo journalctl -u calendar-web --since "1 hour ago"
+
+# Log trong khoảng thời gian
+sudo journalctl -u calendar-web --since "2024-01-01" --until "2024-01-31"
+```
+
+**Xem log với định dạng chi tiết:**
+```bash
+# Hiển thị log với timestamp chi tiết
+sudo journalctl -u calendar-web -o verbose
+
+# Hiển thị log dạng JSON
+sudo journalctl -u calendar-web -o json-pretty
+
+# Reverse order (mới nhất ở trên)
+sudo journalctl -u calendar-web -r
+```
+
+**Xem log lỗi:**
+```bash
+# Chỉ xem log lỗi
+sudo journalctl -u calendar-web -p err
+
+# Xem log với priority (0=emerg, 1=alert, 2=crit, 3=err, 4=warning)
+sudo journalctl -u calendar-web -p 3
+```
+
+#### 5. Troubleshooting
+
+**Kiểm tra service có chạy không:**
+```bash
+sudo systemctl is-active calendar-web
+sudo systemctl is-enabled calendar-web
+```
+
+**Xem thông tin chi tiết service:**
+```bash
+sudo systemctl show calendar-web
+```
+
+**Kiểm tra file cấu hình service:**
+```bash
+systemctl cat calendar-web
+```
+
+**Reload sau khi sửa file service:**
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart calendar-web
+```
+
 ## 🧪 Testing
 
 ```bash
