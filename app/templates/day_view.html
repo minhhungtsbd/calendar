@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}{{ selected_date.strftime('%d/%m/%Y') }} - Calendar{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    📅 {{ selected_date.strftime('%d/%m/%Y') }}
+                </h1>
+                <p class="text-lg text-red-600 dark:text-red-400 mt-1">
+                    🌙 {{ lunar_info.lunar_date_vietnamese }}
+                </p>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <!-- Back to Calendar -->
+                <a href="/?year={{ selected_date.year }}&month={{ selected_date.month }}" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-sm font-medium">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Về lịch
+                </a>
+                
+                <!-- Add Note -->
+                <button id="toggle-note-form-btn"
+                        data-date="{{ selected_date.strftime('%Y-%m-%d') }}"
+                        class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span id="toggle-btn-text">Thêm ghi chú</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Date Info -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <div>
+                        <div class="text-sm text-blue-600 dark:text-blue-400">Dương lịch</div>
+                        <div class="text-lg font-semibold text-blue-800 dark:text-blue-200">
+                            {{ selected_date.strftime('%d/%m/%Y') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                    <div>
+                        <div class="text-sm text-red-600 dark:text-red-400">Âm lịch</div>
+                        <div class="text-lg font-semibold text-red-800 dark:text-red-200">
+                            {{ lunar_info.lunar_date_str }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <div>
+                        <div class="text-sm text-purple-600 dark:text-purple-400">Ghi chú</div>
+                        <div class="text-lg font-semibold text-purple-800 dark:text-purple-200">
+                            {{ notes|length }} ghi chú
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Holidays Section -->
+        {% if holidays %}
+        <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                🎉 Ngày lễ hôm nay
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for holiday in holidays %}
+                <div class="p-4 rounded-lg border-2 
+                            {% if holiday.type == 'national' %}
+                                bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700
+                            {% else %}
+                                bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700
+                            {% endif %}">
+                    <div class="flex items-center">
+                        <div class="text-2xl mr-3">
+                            {% if holiday.type == 'national' %}🇻🇳{% else %}🏮{% endif %}
+                        </div>
+                        <div>
+                            <div class="font-bold 
+                                        {% if holiday.type == 'national' %}
+                                            text-green-800 dark:text-green-200
+                                        {% else %}
+                                            text-red-800 dark:text-red-200
+                                        {% endif %}">
+                                {{ holiday.name }}
+                            </div>
+                            {% if holiday.description %}
+                            <div class="text-sm 
+                                        {% if holiday.type == 'national' %}
+                                            text-green-600 dark:text-green-300
+                                        {% else %}
+                                            text-red-600 dark:text-red-300
+                                        {% endif %}">
+                                {{ holiday.description }}
+                            </div>
+                            {% endif %}
+                            <div class="text-xs 
+                                        {% if holiday.type == 'national' %}
+                                            text-green-500 dark:text-green-400
+                                        {% else %}
+                                            text-red-500 dark:text-red-400
+                                        {% endif %}">
+                                {% if holiday.type == 'national' %}
+                                    📡 Google Calendar
+                                {% else %}
+                                    🌙 Âm lịch
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% elif google_calendar_configured %}
+        <div class="mb-6">
+            <div class="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="text-4xl mb-2">📅</div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">
+                    Không có ngày lễ hôm nay
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Ngày {{ selected_date.strftime('%d/%m/%Y') }} không có ngày lễ nào được ghi nhận.
+                </p>
+            </div>
+        </div>
+        {% else %}
+        <div class="mb-6">
+            <div class="text-center p-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-2 border-yellow-200 dark:border-yellow-700">
+                <div class="text-4xl mb-2">⚠️</div>
+                <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                    Google Calendar chưa được cấu hình
+                </h3>
+                <p class="text-sm text-yellow-600 dark:text-yellow-300">
+                    Để hiển thị ngày lễ quốc gia, vui lòng cấu hình Google Calendar API key.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+        </div>
+        
+        <!-- Note Form Container -->
+        <div id="note-form-container"></div>
+    </div>
+
+    <!-- Notes for this day -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                📝 Ghi chú ngày {{ selected_date.strftime('%d/%m/%Y') }}
+            </h2>
+        </div>
+        
+        <div id="notes-list" class="p-6">
+            {% if notes %}
+                {% for note in notes %}
+                    {% include "components/note_item.html" with context %}
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Chưa có ghi chú nào cho ngày này.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Feng Shui Analysis Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            {% if personal_feng_shui %}
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                🔮 Phong thủy cá nhân ngày {{ selected_date.strftime('%d/%m/%Y') }}
+            </h2>
+            {% elif feng_shui_analysis %}
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                🔮 Phong thủy ngày {{ selected_date.strftime('%d/%m/%Y') }}
+            </h2>
+            {% else %}
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                🔮 Phong thủy
+            </h2>
+            {% endif %}
+        </div>
+        
+        <div class="p-6">
+        {% if personal_feng_shui %}
+        <!-- Personal Feng Shui Section -->
+            
+            <!-- Birthday Reminder -->
+            {% if personal_feng_shui.birthday_reminder %}
+            <div class="mb-4 p-4 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/20 dark:to-purple-900/20 rounded-lg border-2 border-pink-300 dark:border-pink-700">
+                <div class="text-center">
+                    <div class="text-2xl mb-2">{{ personal_feng_shui.birthday_reminder.message }}</div>
+                    <p class="text-pink-700 dark:text-pink-300">{{ personal_feng_shui.birthday_reminder.advice }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Compatibility Score -->
+            <div class="mb-4 p-4 rounded-lg border-2 
+                        {% if personal_feng_shui.compatibility.score >= 80 %}
+                            bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700
+                        {% elif personal_feng_shui.compatibility.score >= 60 %}
+                            bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700
+                        {% elif personal_feng_shui.compatibility.score >= 40 %}
+                            bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700
+                        {% else %}
+                            bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700
+                        {% endif %}">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="text-md font-semibold 
+                               {% if personal_feng_shui.compatibility.score >= 80 %}
+                                   text-green-800 dark:text-green-200
+                               {% elif personal_feng_shui.compatibility.score >= 60 %}
+                                   text-blue-800 dark:text-blue-200
+                               {% elif personal_feng_shui.compatibility.score >= 40 %}
+                                   text-yellow-800 dark:text-yellow-200
+                               {% else %}
+                                   text-red-800 dark:text-red-200
+                               {% endif %}">
+                        📊 Độ tương thích: {{ personal_feng_shui.compatibility.level }}
+                    </h4>
+                    <div class="text-2xl font-bold 
+                                {% if personal_feng_shui.compatibility.score >= 80 %}
+                                    text-green-600 dark:text-green-400
+                                {% elif personal_feng_shui.compatibility.score >= 60 %}
+                                    text-blue-600 dark:text-blue-400
+                                {% elif personal_feng_shui.compatibility.score >= 40 %}
+                                    text-yellow-600 dark:text-yellow-400
+                                {% else %}
+                                    text-red-600 dark:text-red-400
+                                {% endif %}">
+                        {{ personal_feng_shui.compatibility.score }}/100
+                    </div>
+                </div>
+                <p class="text-sm 
+                          {% if personal_feng_shui.compatibility.score >= 80 %}
+                              text-green-700 dark:text-green-300
+                          {% elif personal_feng_shui.compatibility.score >= 60 %}
+                              text-blue-700 dark:text-blue-300
+                          {% elif personal_feng_shui.compatibility.score >= 40 %}
+                              text-yellow-700 dark:text-yellow-300
+                          {% else %}
+                              text-red-700 dark:text-red-300
+                          {% endif %}">
+                    {{ personal_feng_shui.compatibility.analysis }}
+                </p>
+            </div>
+            
+            <!-- User Info and Day Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-700">
+                    <h4 class="text-sm text-purple-600 dark:text-purple-400 font-medium mb-2">👤 Thông tin cá nhân</h4>
+                    <div class="space-y-1 text-sm">
+                        <div><strong>Mệnh:</strong> {{ personal_feng_shui.user_info.birth_year_element }}</div>
+                        <div><strong>Nạp âm:</strong> {{ personal_feng_shui.user_info.birth_year_desc }}</div>
+                        <div><strong>Tuổi:</strong> {{ personal_feng_shui.user_info.zodiac }}</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-lg p-4 border-2 border-indigo-200 dark:border-indigo-700">
+                    <h4 class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mb-2">📅 Thông tin ngày</h4>
+                    <div class="space-y-1 text-sm">
+                        <div><strong>Can Chi:</strong> {{ personal_feng_shui.day_info.can_chi }}</div>
+                        <div><strong>Ngũ hành:</strong> {{ personal_feng_shui.day_info.element.value }}</div>
+                        <div><strong>Hướng tốt:</strong> {{ personal_feng_shui.day_info.lucky_direction }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Personal Activities -->
+            {% if personal_feng_shui.personal_advice.activities.avoid %}
+            <!-- Layout with both recommended and avoid activities (2 columns side by side) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+                <!-- Recommended Activities -->
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border-2 border-green-200 dark:border-green-700">
+                    <h4 class="text-md font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center">
+                        ✅ Hoạt động nên làm (cá nhân hóa)
+                    </h4>
+                    <ul class="space-y-2">
+                        {% for activity in personal_feng_shui.personal_advice.activities.recommended %}
+                        <li class="text-sm text-green-700 dark:text-green-300 flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            {{ activity }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Activities to Avoid -->
+                <div class="bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-lg p-4 border-2 border-red-200 dark:border-red-700">
+                    <h4 class="text-md font-semibold text-red-800 dark:text-red-200 mb-3 flex items-center">
+                        ❌ Hoạt động nên tránh (cá nhân hóa)
+                    </h4>
+                    <ul class="space-y-2">
+                        {% for activity in personal_feng_shui.personal_advice.activities.avoid %}
+                        <li class="text-sm text-red-700 dark:text-red-300 flex items-start">
+                            <span class="text-red-500 mr-2">•</span>
+                            {{ activity }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% else %}
+            <!-- Layout with only recommended activities (full width with 2 columns inside) -->
+            <div class="mb-4">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border-2 border-green-200 dark:border-green-700">
+                    <h4 class="text-md font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center">
+                        ✅ Hoạt động nên làm (cá nhân hóa)
+                    </h4>
+                    <!-- Two column layout for activities -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <ul class="space-y-2">
+                            {% for activity in personal_feng_shui.personal_advice.activities.recommended[:((personal_feng_shui.personal_advice.activities.recommended|length + 1) // 2)] %}
+                            <li class="text-sm text-green-700 dark:text-green-300 flex items-start">
+                                <span class="text-green-500 mr-2">•</span>
+                                {{ activity }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <ul class="space-y-2">
+                            {% for activity in personal_feng_shui.personal_advice.activities.recommended[((personal_feng_shui.personal_advice.activities.recommended|length + 1) // 2):] %}
+                            <li class="text-sm text-green-700 dark:text-green-300 flex items-start">
+                                <span class="text-green-500 mr-2">•</span>
+                                {{ activity }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Lucky Hours and Personal Colors -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+                <!-- Lucky Hours -->
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-700">
+                    <h4 class="text-md font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
+                        ⏰ Giờ hoàng đạo
+                    </h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        {% for hour in personal_feng_shui.day_info.lucky_hours %}
+                        <div class="text-xs bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                            <div class="font-medium">{{ hour.name }}</div>
+                            <div class="text-blue-600 dark:text-blue-300">{{ hour.time_range }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Personal Colors -->
+                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg p-4 border-2 border-yellow-200 dark:border-yellow-700">
+                    <h4 class="text-md font-semibold text-yellow-800 dark:text-yellow-200 mb-3 flex items-center">
+                        🎨 Màu sắc may mắn (cá nhân)
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                        {% for color in personal_feng_shui.personal_advice.colors %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200">
+                            {{ color }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if personal_feng_shui.day_info.conflicting_zodiacs %}
+                    <div class="mt-3 pt-3 border-t border-yellow-200 dark:border-yellow-700">
+                        <div class="text-sm text-yellow-700 dark:text-yellow-300">
+                            <strong>⚠️ Con giáp xung khắc:</strong> {{ personal_feng_shui.day_info.conflicting_zodiacs|join(', ') }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Overall Personal Advice -->
+            <div class="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border-2 border-indigo-200 dark:border-indigo-700">
+                <h4 class="text-md font-semibold text-indigo-800 dark:text-indigo-200 mb-2 flex items-center">
+                    💡 Lời khuyên tổng quan
+                </h4>
+                <p class="text-sm text-indigo-700 dark:text-indigo-300">
+                    {{ personal_feng_shui.personal_advice.overall_advice }}
+                </p>
+            </div>
+        </div>
+        
+        {% elif feng_shui_analysis %}
+        <!-- General Feng Shui Section -->
+            
+            <!-- Can Chi and Element -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-700">
+                    <div class="text-sm text-purple-600 dark:text-purple-400 font-medium">Can Chi</div>
+                    <div class="text-lg font-bold text-purple-800 dark:text-purple-200">
+                        {{ feng_shui_analysis.can_chi }}
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-lg p-4 border-2 border-indigo-200 dark:border-indigo-700">
+                    <div class="text-sm text-indigo-600 dark:text-indigo-400 font-medium">Ngũ hành</div>
+                    <div class="text-lg font-bold text-indigo-800 dark:text-indigo-200">
+                        {{ feng_shui_analysis.element.value }}
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20 rounded-lg p-4 border-2 border-pink-200 dark:border-pink-700">
+                    <div class="text-sm text-pink-600 dark:text-pink-400 font-medium">Địa Chi</div>
+                    <div class="text-lg font-bold text-pink-800 dark:text-pink-200">
+                        {{ feng_shui_analysis.dia_chi }}
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900/20 dark:to-teal-800/20 rounded-lg p-4 border-2 border-teal-200 dark:border-teal-700">
+                    <div class="text-sm text-teal-600 dark:text-teal-400 font-medium">Hướng tốt</div>
+                    <div class="text-lg font-bold text-teal-800 dark:text-teal-200">
+                        {{ feng_shui_analysis.lucky_direction }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lucky Activities and Colors -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+                <!-- Lucky Activities -->
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border-2 border-green-200 dark:border-green-700">
+                    <h4 class="text-md font-semibold text-green-800 dark:text-green-200 mb-3 flex items-center">
+                        ✅ Hoạt động nên làm
+                    </h4>
+                    <ul class="space-y-2">
+                        {% for activity in feng_shui_analysis.lucky_activities[:5] %}
+                        <li class="text-sm text-green-700 dark:text-green-300 flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            {{ activity }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Unlucky Activities -->
+                <div class="bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-lg p-4 border-2 border-red-200 dark:border-red-700">
+                    <h4 class="text-md font-semibold text-red-800 dark:text-red-200 mb-3 flex items-center">
+                        ❌ Hoạt động nên tránh
+                    </h4>
+                    <ul class="space-y-2">
+                        {% for activity in feng_shui_analysis.unlucky_activities[:5] %}
+                        <li class="text-sm text-red-700 dark:text-red-300 flex items-start">
+                            <span class="text-red-500 mr-2">•</span>
+                            {{ activity }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Lucky Hours and Colors -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Lucky Hours -->
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-700">
+                    <h4 class="text-md font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
+                        ⏰ Giờ hoàng đạo
+                    </h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        {% for hour in feng_shui_analysis.lucky_hours %}
+                        <div class="text-xs bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                            <div class="font-medium">{{ hour.name }}</div>
+                            <div class="text-blue-600 dark:text-blue-300">{{ hour.time_range }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Lucky Colors -->
+                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg p-4 border-2 border-yellow-200 dark:border-yellow-700">
+                    <h4 class="text-md font-semibold text-yellow-800 dark:text-yellow-200 mb-3 flex items-center">
+                        🎨 Màu sắc may mắn
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                        {% for color in feng_shui_analysis.lucky_colors %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200">
+                            {{ color }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if feng_shui_analysis.conflicting_zodiacs %}
+                    <div class="mt-3 pt-3 border-t border-yellow-200 dark:border-yellow-700">
+                        <div class="text-sm text-yellow-700 dark:text-yellow-300">
+                            <strong>⚠️ Con giáp xung khắc:</strong> {{ feng_shui_analysis.conflicting_zodiacs|join(', ') }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <!-- No Birth Date - Encourage User to Add -->
+        {% if current_user %}
+            <div class="text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+                <div class="text-4xl mb-3">🔮</div>
+                <h3 class="text-lg font-medium text-blue-800 dark:text-blue-200 mb-2">
+                    Nhận phong thủy cá nhân hóa
+                </h3>
+                <p class="text-sm text-blue-600 dark:text-blue-300 mb-4">
+                    Thêm ngày sinh để nhận lời khuyên phong thủy phù hợp với mệnh của bạn
+                </p>
+                <a href="/auth/profile" 
+                   class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm font-medium">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Cập nhật ngày sinh
+                </a>
+            </div>
+        {% endif %}
+        {% endif %}
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between items-center">
+        {% set prev_date = selected_date - timedelta(days=1) %}
+        {% set next_date = selected_date + timedelta(days=1) %}
+        
+        <a href="/day/{{ prev_date.strftime('%Y-%m-%d') }}" 
+           class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-sm font-medium">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            {{ prev_date.strftime('%d/%m') }}
+        </a>
+        
+        <a href="/day/{{ next_date.strftime('%Y-%m-%d') }}" 
+           class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-sm font-medium">
+            {{ next_date.strftime('%d/%m') }}
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let formVisible = false;
+
+    // Toggle note form
+    function toggleNoteForm(date) {
+        const container = document.getElementById('note-form-container');
+        const btnText = document.getElementById('toggle-btn-text');
+        
+        if (!formVisible) {
+            // Show form
+            const url = '/notes/new' + (date ? '?date=' + date : '');
+            htmx.ajax('GET', url, {target: '#note-form-container', swap: 'innerHTML'});
+            btnText.textContent = 'Ẩn form';
+            formVisible = true;
+        } else {
+            // Hide form
+            container.innerHTML = '';
+            btnText.textContent = 'Thêm ghi chú';
+            formVisible = false;
+        }
+    }
+
+    // Delete note function
+    function deleteNote(noteId) {
+        if (confirm('Bạn có chắc chắn muốn xóa ghi chú này?')) {
+            htmx.ajax('DELETE', `/notes/${noteId}`, {
+                target: '#notes-list',
+                swap: 'innerHTML'
+            });
+        }
+    }
+
+    // Modal functions for edit popup
+    function openModal() {
+        // Create modal if it doesn't exist
+        let modal = document.getElementById('modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modal';
+            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50';
+            modal.innerHTML = `
+                <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Chỉnh sửa ghi chú</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="modal-content">
+                        <!-- Form content will be loaded here -->
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            const modalContent = document.getElementById('modal-content');
+            if (modalContent) {
+                modalContent.innerHTML = '';
+            }
+        }
+    }
+
+    // Event listeners for buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggle-note-form-btn');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const date = this.getAttribute('data-date');
+                toggleNoteForm(date);
+            });
+        }
+
+        // Handle other toggle buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('toggle-note-form-btn')) {
+                const date = e.target.getAttribute('data-date');
+                toggleNoteForm(date);
+            }
+        });
+    });
+
+    // Auto-refresh every 2 minutes
+    setInterval(function() {
+        if (document.visibilityState === 'visible') {
+            htmx.ajax('GET', window.location.pathname, {target: '#notes-list', swap: 'innerHTML'});
+        }
+    }, 2 * 60 * 1000);
+</script>
+{% endblock %}

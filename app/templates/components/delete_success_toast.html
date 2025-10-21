@@ -1,0 +1,8 @@
+<!-- Delete success toast -->
+<script>
+setTimeout(() => {
+    if (window.showSuccess) {
+        window.showSuccess("{{ success_message|replace('"', '\\"') }}");
+    }
+}, 100);
+</script> 

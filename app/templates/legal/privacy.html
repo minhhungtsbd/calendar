@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Chính sách bảo mật - Calendar{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Chính sách bảo mật</h1>
+            
+            <div class="prose prose-lg max-w-none">
+                <p class="text-gray-600 mb-6">
+                    <strong>Ngày có hiệu lực:</strong> 01/01/2025
+                </p>
+                
+                <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">1. Giới thiệu</h2>
+                <p class="text-gray-700 mb-4">
+                    Ứng dụng Calendar cam kết bảo vệ quyền riêng tư và thông tin cá nhân của bạn.
+                    Chính sách này mô tả cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">2. Thông tin chúng tôi thu thập</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">2.1. Thông tin tài khoản</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Khi bạn đăng nhập bằng Google, chúng tôi thu thập:
+                </p>
+                <ul class="mb-6 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li><strong>Google ID:</strong> Mã định danh duy nhất từ Google</li>
+                    <li><strong>Email:</strong> Địa chỉ email từ tài khoản Google</li>
+                    <li><strong>Tên:</strong> Tên hiển thị từ profile Google</li>
+                    <li><strong>Ảnh đại diện:</strong> URL ảnh profile từ Google (nếu có)</li>
+                </ul>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">2.2. Nội dung người dùng</h3>
+                <ul class="mb-6 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li><strong>Ghi chú:</strong> Tiêu đề và nội dung ghi chú bạn tạo</li>
+                    <li><strong>Ngày ghi chú:</strong> Ngày âm/dương được gắn với ghi chú</li>
+                    <li><strong>Cài đặt thông báo:</strong> Tùy chọn nhắc nhở của bạn</li>
+                </ul>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">2.3. Thông tin kỹ thuật</h3>
+                <ul class="mb-6 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li><strong>Địa chỉ IP:</strong> Cho mục đích bảo mật và analytics</li>
+                    <li><strong>User Agent:</strong> Thông tin về trình duyệt và thiết bị</li>
+                    <li><strong>Session cookies:</strong> Để duy trì trạng thái đăng nhập</li>
+                    <li><strong>Logs truy cập:</strong> Thời gian và trang được truy cập</li>
+                </ul>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">3. Cách chúng tôi sử dụng thông tin</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">3.1. Cung cấp dịch vụ</h3>
+                <ul class="mb-4 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li>Xác thực và quản lý tài khoản người dùng</li>
+                    <li>Lưu trữ và hiển thị ghi chú cá nhân</li>
+                    <li>Gửi thông báo nhắc nhở theo cài đặt</li>
+                    <li>Cung cấp tính năng lịch âm dương</li>
+                </ul>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">3.2. Cải thiện dịch vụ</h3>
+                <ul class="mb-6 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li>Phân tích cách sử dụng để cải thiện trải nghiệm</li>
+                    <li>Khắc phục lỗi và tối ưu hóa hiệu suất</li>
+                    <li>Phát triển tính năng mới dựa trên nhu cầu người dùng</li>
+                </ul>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">4. Chia sẻ thông tin</h2>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Chúng tôi <strong>KHÔNG</strong> bán, cho thuê hoặc chia sẻ thông tin cá nhân của bạn 
+                    với bên thứ ba, trừ các trường hợp sau:
+                </p>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">4.1. Với sự đồng ý của bạn</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Khi bạn rõ ràng đồng ý việc chia sẻ thông tin cho mục đích cụ thể.
+                </p>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">4.2. Dịch vụ bên thứ ba cần thiết</h3>
+                <ul class="mb-4 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li><strong>Google APIs:</strong> Để xác thực tài khoản và lấy thông tin lịch</li>
+                    <li><strong>Email services:</strong> Để gửi thông báo nhắc nhở</li>
+                    <li><strong>Telegram Bot API:</strong> Để gửi thông báo qua Telegram</li>
+                </ul>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">4.3. Yêu cầu pháp lý</h3>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Khi được yêu cầu bởi tòa án, cơ quan thực thi pháp luật hoặc cơ quan chính phủ có thẩm quyền.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">5. Bảo mật thông tin</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">5.1. Biện pháp kỹ thuật</h3>
+                <ul class="mb-4 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li><strong>Mã hóa HTTPS:</strong> Tất cả dữ liệu truyền tải được mã hóa</li>
+                    <li><strong>Session tokens:</strong> Sử dụng tokens an toàn với thời hạn</li>
+                    <li><strong>Database security:</strong> Mã hóa mật khẩu và dữ liệu nhạy cảm</li>
+                    <li><strong>Access controls:</strong> Kiểm soát quyền truy cập nghiêm ngặt</li>
+                </ul>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">5.2. Biện pháp quản lý</h3>
+                <ul class="mb-6 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li>Giới hạn quyền truy cập dữ liệu cho nhân viên</li>
+                    <li>Monitoring và logging hoạt động hệ thống</li>
+                    <li>Backup và disaster recovery procedures</li>
+                    <li>Regular security audits và vulnerability scans</li>
+                </ul>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">6. Cookies và tracking</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">6.1. Session cookies</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Chúng tôi sử dụng session cookies để duy trì trạng thái đăng nhập của bạn. 
+                    Cookies này cần thiết cho hoạt động của ứng dụng.
+                </p>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">6.2. Analytics cookies</h3>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Hiện tại chúng tôi không sử dụng Google Analytics hay các công cụ tracking bên thứ ba. 
+                    Nếu có thay đổi trong tương lai, chúng tôi sẽ cập nhật chính sách này.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">7. Quyền của người dùng</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">7.1. Quyền truy cập</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Bạn có thể xem và quản lý thông tin cá nhân thông qua trang profile của mình.
+                </p>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">7.2. Quyền chỉnh sửa</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Bạn có thể cập nhật thông tin profile và nội dung ghi chú bất cứ lúc nào.
+                </p>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">7.3. Quyền xóa</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Bạn có thể xóa tài khoản và tất cả dữ liệu liên quan bằng cách liên hệ với chúng tôi.
+                </p>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">7.4. Quyền export dữ liệu</h3>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Bạn có thể yêu cầu xuất tất cả dữ liệu cá nhân của mình trong định dạng có thể đọc được.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">8. Lưu trữ dữ liệu</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">8.1. Thời gian lưu trữ</h3>
+                <ul class="mb-4 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li><strong>Dữ liệu tài khoản:</strong> Lưu trữ cho đến khi bạn xóa tài khoản</li>
+                    <li><strong>Ghi chú:</strong> Lưu trữ cho đến khi bạn xóa</li>
+                    <li><strong>Logs hệ thống:</strong> Lưu trữ tối đa 90 ngày</li>
+                </ul>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">8.2. Vị trí lưu trữ</h3>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Dữ liệu được lưu trữ trên các server đáng tin cậy với các biện pháp bảo mật phù hợp.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">9. Dịch vụ của bên thứ ba</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">9.1. Google Services</h3>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Chúng tôi sử dụng Google OAuth và Google Calendar API. Vui lòng xem 
+                    <a href="https://policies.google.com/privacy" target="_blank" class="text-indigo-600 hover:text-indigo-500 underline">
+                        Chính sách bảo mật của Google
+                    </a> để hiểu cách Google xử lý dữ liệu của bạn.
+                </p>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">9.2. Telegram Bot API</h3>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Nếu bạn chọn nhận thông báo qua Telegram, chúng tôi sẽ gửi tin nhắn thông qua Telegram Bot API. 
+                    Vui lòng xem chính sách bảo mật của Telegram để biết thêm thông tin.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">10. Thay đổi chính sách</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Chúng tôi có thể cập nhật chính sách bảo mật này theo thời gian. Các thay đổi quan trọng 
+                    sẽ được thông báo qua email hoặc thông báo trên ứng dụng. Việc tiếp tục sử dụng dịch vụ 
+                    sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận chính sách mới.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">11. Liên hệ về bảo mật</h2>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Nếu bạn có bất kỳ câu hỏi hoặc lo ngại nào về chính sách bảo mật này, hoặc muốn thực hiện 
+                    các quyền của mình, vui lòng liên hệ:
+                </p>
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <p class="text-gray-700"><strong>Email bảo mật:</strong> privacy@minhhungtsbd.me</p>
+                    <p class="text-gray-700"><strong>Email hỗ trợ:</strong> support@minhhungtsbd.me</p>
+                    <p class="text-gray-700"><strong>Thời gian phản hồi:</strong> Trong vòng 72 giờ</p>
+                </div>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">12. Tuân thủ pháp luật</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Chính sách bảo mật này tuân thủ các quy định pháp luật Việt Nam về bảo vệ dữ liệu cá nhân 
+                    và các tiêu chuẩn quốc tế về quyền riêng tư. Chúng tôi cam kết tuân thủ Nghị định 13/2023/NĐ-CP 
+                    về bảo vệ dữ liệu cá nhân.
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-12 pt-6 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center">
+                    <p class="text-sm text-gray-500 mb-4 sm:mb-0">
+                        Cập nhật lần cuối: {{ "06/01/2025" }}
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="/terms" class="text-sm text-indigo-600 hover:text-indigo-500">
+                            Điều khoản sử dụng
+                        </a>
+                        <a href="/" class="text-sm text-indigo-600 hover:text-indigo-500">
+                            Quay về trang chính
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

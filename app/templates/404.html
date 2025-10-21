@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Không tìm thấy trang - Calendar{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full text-center">
+        <div class="mb-8">
+            <div class="text-9xl font-bold text-gray-300 dark:text-gray-600">404</div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-4">
+                Không tìm thấy trang
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">
+                Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
+            </p>
+        </div>
+        
+        <div class="space-y-4">
+            <a href="/" 
+               class="inline-flex items-center px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Về trang chủ
+            </a>
+            
+            <div class="flex justify-center space-x-4">
+                <a href="/notes" class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200">
+                    Ghi chú
+                </a>
+                <a href="/notifications" class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200">
+                    Thông báo
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-sm text-gray-500 dark:text-gray-400">
+            <p>Nếu bạn nghĩ đây là lỗi, vui lòng liên hệ với chúng tôi.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Ghi chú - Calendar{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                📝 Danh sách ghi chú
+            </h1>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-6">
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ notes|length }}</div>
+                        <div class="text-sm text-blue-500 dark:text-blue-300">Tổng ghi chú</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                            {% set upcoming_notes = [] %}
+                    {% for note in notes %}
+                        {% if note.solar_date >= today %}
+                            {% set _ = upcoming_notes.append(note) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ upcoming_notes|length }}
+                        </div>
+                        <div class="text-sm text-purple-500 dark:text-purple-300">Ghi chú sắp tới</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes List -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 class="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
+                Danh sách ghi chú
+            </h2>
+            <button 
+                hx-get="/notes/new"
+                hx-target="#modal-content"
+                hx-trigger="click"
+                onclick="openModal()"
+                class="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent shadow-sm text-xs sm:text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+                <svg class="-ml-1 mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <span class="hidden sm:inline">Tạo ghi chú mới</span>
+                <span class="sm:hidden">Tạo mới</span>
+            </button>
+        </div>
+        
+        <!-- Notes Table Container -->
+        <div id="notes-list">
+            {% include "components/notes_table.html" %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for forms -->
+<div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900" id="modal-title">Ghi chú</h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div id="modal-content">
+            <!-- Form content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal() {
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+    document.getElementById('modal-content').innerHTML = '';
+}
+
+// Close modal when clicking outside
+document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Handle success messages
+function showSuccess(message) {
+    // Create toast notification
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Handle URL success parameter
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('success') === 'created') {
+    showSuccess('✅ Đã tạo ghi chú thành công!');
+    // Remove success parameter from URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+// Handle edit parameter - auto open edit modal
+const editId = urlParams.get('edit');
+if (editId) {
+    // Load edit form and open modal
+    htmx.ajax('GET', `/notes/${editId}/edit-form`, {
+        target: '#modal-content',
+        swap: 'innerHTML'
+    }).then(() => {
+        openModal();
+        // Remove edit parameter from URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    });
+}
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Lỗi máy chủ - Calendar{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full text-center">
+        <div class="mb-8">
+            <div class="text-9xl font-bold text-red-300 dark:text-red-600">500</div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-4">
+                Lỗi máy chủ
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">
+                Đã xảy ra lỗi không mong muốn. Chúng tôi đang khắc phục sự cố.
+            </p>
+        </div>
+        
+        <div class="space-y-4">
+            <button onclick="window.location.reload()" 
+                    class="inline-flex items-center px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Thử lại
+            </button>
+            
+            <div>
+                <a href="/" class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200">
+                    Về trang chủ
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-sm text-gray-500 dark:text-gray-400">
+            <p>Mã lỗi: 500 - Internal Server Error</p>
+            <p class="mt-1">Thời gian: {{ moment().format('DD/MM/YYYY HH:mm:ss') if moment else '' }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

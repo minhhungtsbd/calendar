@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: calendar_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: calendar_db
+      MYSQL_USER: calendar_user
+      MYSQL_PASSWORD: calendar_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis for Celery
+  redis:
+    image: redis:7-alpine
+    container_name: calendar_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # FastAPI Application
+  web:
+    build: .
+    container_name: calendar_web
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://calendar_user:calendar_password@mysql:3306/calendar_db
+      - REDIS_URL=redis://redis:6379/0
+      # Optional: Override Telegram API URL (default: https://tele-api.cloudmini.net)
+      # - TELEGRAM_API_URL=https://tele-api.cloudmini.net
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    command: python run.py
+
+  # Celery Worker
+  celery_worker:
+    build: .
+    container_name: calendar_celery_worker
+    environment:
+      - DATABASE_URL=mysql+pymysql://calendar_user:calendar_password@mysql:3306/calendar_db
+      - REDIS_URL=redis://redis:6379/0
+      # Optional: Override Telegram API URL (default: https://tele-api.cloudmini.net)
+      # - TELEGRAM_API_URL=https://tele-api.cloudmini.net
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    command: celery -A app.tasks.notification_tasks worker --loglevel=info
+
+  # Celery Beat (Scheduler)
+  celery_beat:
+    build: .
+    container_name: calendar_celery_beat
+    environment:
+      - DATABASE_URL=mysql+pymysql://calendar_user:calendar_password@mysql:3306/calendar_db
+      - REDIS_URL=redis://redis:6379/0
+      # Optional: Override Telegram API URL (default: https://tele-api.cloudmini.net)
+      # - TELEGRAM_API_URL=https://tele-api.cloudmini.net
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    command: celery -A app.tasks.notification_tasks beat --loglevel=info
+
+volumes:
+  mysql_data:
+  redis_data:

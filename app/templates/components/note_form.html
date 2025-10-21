@@ -1,0 +1,202 @@
+<div class="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-6 border-2 border-blue-200 dark:border-gray-500 shadow-lg animate-slideDown">
+    <h3 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-400 mb-6">
+        {% if note %}📝 Chỉnh sửa ghi chú{% else %}✨ Thêm ghi chú mới{% endif %}
+    </h3>
+    
+    <form {% if note %}
+            hx-post="/notes/{{ note.id }}/edit"
+          {% else %}
+            hx-post="/notes/new"
+          {% endif %}
+          hx-target="this"
+          hx-swap="outerHTML"
+          class="space-y-4">
+        
+        <!-- Title -->
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Tiêu đề *
+            </label>
+            <input type="text" 
+                   id="title" 
+                   name="title" 
+                   value="{% if note %}{{ note.title }}{% endif %}"
+                   required
+                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                          bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                          focus:ring-primary-500 focus:border-primary-500">
+        </div>
+        
+        <!-- Content -->
+        <div>
+            <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Nội dung
+            </label>
+            <textarea id="content" 
+                      name="content" 
+                      rows="3"
+                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                             focus:ring-primary-500 focus:border-primary-500">{% if note %}{{ note.content }}{% endif %}</textarea>
+        </div>
+        
+        <!-- Date -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="solar_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Ngày *
+                </label>
+                <input type="date" 
+                       id="solar_date" 
+                       name="solar_date" 
+                       value="{% if note %}{{ solar_date_str }}{% else %}{{ today }}{% endif %}"
+                       required
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                              bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                              focus:ring-primary-500 focus:border-primary-500">
+            </div>
+            
+            <div>
+                <label for="calendar_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Loại lịch
+                </label>
+                <select id="calendar_type" 
+                        name="calendar_type"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                               bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                               focus:ring-primary-500 focus:border-primary-500">
+                    <option value="solar" {% if not note or note.calendar_type.value == 'solar' %}selected{% endif %}>
+                        Dương lịch
+                    </option>
+                    <option value="lunar" {% if note and note.calendar_type.value == 'lunar' %}selected{% endif %}>
+                        Âm lịch
+                    </option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Notification Settings -->
+        <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+            <div class="flex items-center mb-3">
+                <input type="checkbox" 
+                       id="enable_notification" 
+                       name="enable_notification" 
+                       value="true"
+                       {% if not note or note.enable_notification %}checked{% endif %}
+                       class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
+                <label for="enable_notification" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                    Bật thông báo nhắc nhở
+                </label>
+            </div>
+            
+            <div id="notification-settings" class="{% if note and not note.enable_notification %}hidden{% endif %}">
+                <label for="notification_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Nhắc trước (số ngày)
+                </label>
+                <input type="number" 
+                       id="notification_days" 
+                       name="notification_days" 
+                       value="{% if note %}{{ note.notification_days_before }}{% else %}3{% endif %}"
+                       min="1"
+                       max="30"
+                       placeholder="3"
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                              bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                              focus:ring-primary-500 focus:border-primary-500">
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Ví dụ: 5 sẽ nhắc từ 5 ngày trước đến ngày sự kiện (tổng 6 thông báo)
+                </p>
+                
+                <!-- Yearly Repeat Option -->
+                <div class="flex items-center mt-3">
+                    <input type="checkbox" 
+                           id="yearly_repeat" 
+                           name="yearly_repeat" 
+                           value="true"
+                           {% if note and note.yearly_repeat %}checked{% endif %}
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
+                    <label for="yearly_repeat" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        🔄 Lặp lại hàng năm
+                    </label>
+                </div>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Sau khi hoàn thành thông báo, sẽ tự động chuyển sang năm tiếp theo
+                </p>
+            </div>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="flex items-center justify-end space-x-3 pt-6">
+            <button type="button"
+                    onclick="hideNoteForm()"
+                    class="px-6 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-105 shadow-md">
+                ❌ Hủy
+            </button>
+            <button type="submit"
+                    class="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                {% if note %}🔄 Cập nhật{% else %}✅ Thêm{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Handle form response based on page context
+    function handleFormResponse(event) {
+        if (event.detail.successful) {
+            const currentPath = window.location.pathname;
+            
+            // Check if response is a redirect (status 302)
+            if (event.detail.xhr.status === 302) {
+                // Follow the redirect
+                window.location.href = event.detail.xhr.getResponseHeader('Location') || '/notes';
+                return;
+            }
+            
+            // For HTMX responses on notes page
+            if (currentPath.includes('/notes')) {
+                // Response already handled by HTMX
+                return;
+            }
+            
+            // For other pages (calendar, day view), redirect to notes
+            if (currentPath === '/' || currentPath.includes('/day/')) {
+                setTimeout(() => {
+                    window.location.href = '/notes?success=created';
+                }, 500);
+            }
+        }
+    }
+
+    // Hide note form function
+    function hideNoteForm() {
+        const container = document.getElementById('note-form-container');
+        if (container) {
+            container.innerHTML = '';
+        }
+        
+        // Close modal if exists
+        if (window.closeModal) {
+            window.closeModal();
+        }
+        
+        // Reset button text if on notes page
+        const btnText = document.getElementById('toggle-btn-text');
+        if (btnText) {
+            btnText.textContent = 'Thêm ghi chú mới';
+            if (typeof formVisible !== 'undefined') {
+                formVisible = false;
+            }
+        }
+    }
+
+    // Toggle notification settings
+    document.getElementById('enable_notification').addEventListener('change', function() {
+        const settings = document.getElementById('notification-settings');
+        if (this.checked) {
+            settings.classList.remove('hidden');
+        } else {
+            settings.classList.add('hidden');
+        }
+    });
+</script>

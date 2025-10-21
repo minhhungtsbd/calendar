@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Điều khoản sử dụng - Calendar{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Điều khoản sử dụng</h1>
+            
+            <div class="prose prose-lg max-w-none">
+                <p class="text-gray-600 mb-6">
+                    <strong>Ngày có hiệu lực:</strong> 01/01/2025
+                </p>
+                
+                <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">1. Chấp nhận điều khoản</h2>
+                <p class="text-gray-700 mb-4">
+                    Bằng cách truy cập và sử dụng ứng dụng Calendar ("Dịch vụ"), bạn đồng ý tuân thủ
+                    và bị ràng buộc bởi các điều khoản và điều kiện sau đây. Nếu bạn không đồng ý 
+                    với bất kỳ phần nào của các điều khoản này, bạn không được phép sử dụng dịch vụ.
+                </p>
+                
+                <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">2. Mô tả dịch vụ</h2>
+                <p class="text-gray-700 mb-4">
+                    Calendar là một ứng dụng web cung cấp các tính năng sau:
+                </p>
+                <ul class="list-disc pl-6 mb-4 text-gray-700">
+                    <li>Hiển thị lịch âm dương Việt Nam</li>
+                    <li>Quản lý ghi chú cá nhân</li>
+                    <li>Hệ thống thông báo tự động</li>
+                    <li>Tích hợp ngày lễ quốc gia từ Google Calendar</li>
+                </ul>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">3. Tài khoản người dùng</h2>
+                <p class="mb-4 text-gray-700 leading-relaxed">
+                    Để sử dụng đầy đủ các tính năng của dịch vụ, bạn cần tạo tài khoản bằng cách:
+                </p>
+                <ul class="mb-6 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li>Đăng nhập thông qua tài khoản Google của bạn</li>
+                    <li>Cung cấp thông tin chính xác và cập nhật</li>
+                    <li>Bảo mật thông tin đăng nhập của bạn</li>
+                    <li>Chịu trách nhiệm về tất cả hoạt động dưới tài khoản của bạn</li>
+                </ul>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">4. Quyền và nghĩa vụ của người dùng</h2>
+                
+                <h3 class="text-lg font-medium text-gray-900 mb-3">4.1. Quyền của người dùng:</h3>
+                <ul class="mb-4 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li>Sử dụng dịch vụ miễn phí cho mục đích cá nhân</li>
+                    <li>Tạo, chỉnh sửa và xóa ghi chú cá nhân</li>
+                    <li>Xuất dữ liệu cá nhân theo yêu cầu</li>
+                    <li>Ngừng sử dụng dịch vụ bất cứ lúc nào</li>
+                </ul>
+
+                <h3 class="text-lg font-medium text-gray-900 mb-3">4.2. Nghĩa vụ của người dùng:</h3>
+                <ul class="mb-6 text-gray-700 leading-relaxed list-disc list-inside space-y-2">
+                    <li>Không sử dụng dịch vụ cho mục đích bất hợp pháp</li>
+                    <li>Không can thiệp vào hoạt động của hệ thống</li>
+                    <li>Không tạo tài khoản giả mạo</li>
+                    <li>Tuân thủ các quy định pháp luật hiện hành</li>
+                </ul>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">5. Nội dung người dùng</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Bạn giữ quyền sở hữu đối với nội dung mà bạn tạo ra (ghi chú, nhắc nhở). 
+                    Chúng tôi cam kết không chia sẻ nội dung cá nhân của bạn với bên thứ ba 
+                    mà không có sự đồng ý của bạn, trừ khi được yêu cầu bởi pháp luật.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">6. Bảo mật và riêng tư</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn theo 
+                    <a href="/privacy" class="text-indigo-600 hover:text-indigo-500 underline">Chính sách bảo mật</a> 
+                    của chúng tôi. Tuy nhiên, không có hệ thống nào là hoàn toàn an toàn 100%, 
+                    và chúng tôi không thể đảm bảo tuyệt đối về bảo mật.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">7. Giới hạn trách nhiệm</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Dịch vụ được cung cấp "như hiện tại" không có bảo hành nào. Chúng tôi không chịu 
+                    trách nhiệm về bất kỳ thiệt hại trực tiếp, gián tiếp, ngẫu nhiên, đặc biệt hoặc 
+                    hậu quả nào phát sinh từ việc sử dụng hoặc không thể sử dụng dịch vụ.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">8. Thay đổi điều khoản</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Chúng tôi có quyền thay đổi các điều khoản này bất cứ lúc nào. Các thay đổi sẽ 
+                    có hiệu lực ngay khi được đăng tải trên trang web. Việc tiếp tục sử dụng dịch vụ 
+                    sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận các điều khoản mới.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">9. Chấm dứt dịch vụ</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Chúng tôi có quyền chấm dứt hoặc tạm ngừng quyền truy cập của bạn vào dịch vụ 
+                    bất cứ lúc nào, với hoặc không có thông báo trước, vì bất kỳ lý do gì, 
+                    bao gồm cả việc vi phạm các điều khoản này.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">10. Luật áp dụng</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Các điều khoản này được điều chỉnh bởi pháp luật Việt Nam. Mọi tranh chấp 
+                    phát sinh sẽ được giải quyết tại các tòa án có thẩm quyền tại Việt Nam.
+                </p>
+
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">11. Liên hệ</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed">
+                    Nếu bạn có bất kỳ câu hỏi nào về các điều khoản này, vui lòng liên hệ với chúng tôi qua:
+                </p>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-700"><strong>Email:</strong> support@minhhungtsbd.me</p>
+                    <p class="text-gray-700"><strong>Website:</strong> <a href="/" class="text-indigo-600 hover:text-indigo-500">Lịch Âm Dương</a></p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-12 pt-6 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center">
+                    <p class="text-sm text-gray-500 mb-4 sm:mb-0">
+                        Cập nhật lần cuối: {{ "06/01/2025" }}
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="/privacy" class="text-sm text-indigo-600 hover:text-indigo-500">
+                            Chính sách bảo mật
+                        </a>
+                        <a href="/" class="text-sm text-indigo-600 hover:text-indigo-500">
+                            Quay về trang chính
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
