@@ -824,6 +824,7 @@ Cần hỗ trợ? Liên hệ: support@example.com
             fallbacks=[CommandHandler("cancel", self.cancel_command)],
             per_chat=True,
             per_user=True,
+            per_message=False,  # Fix warning
         )
         
         application.add_handler(add_note_handler)
@@ -844,7 +845,27 @@ Cần hỗ trợ? Liên hệ: support@example.com
         application.add_handler(CallbackQueryHandler(self.back_to_menu, pattern="^back_to_menu$"))
         application.add_handler(CallbackQueryHandler(self.main_menu_callback))
         
-        logger.info("✅ Telegram bot handlers setup complete")
+        logger.info("✅ Bot handlers ready")
+    
+    async def set_bot_commands(self):
+        """Thiết lập menu commands cho bot"""
+        from telegram import BotCommand
+        
+        commands = [
+            BotCommand("start", "🚀 Khởi động bot và xem menu"),
+            BotCommand("add", "➕ Thêm ghi chú mới"),
+            BotCommand("list", "📋 Xem danh sách ghi chú"),
+            BotCommand("upcoming", "⏰ Xem ghi chú sắp tới"),
+            BotCommand("help", "❓ Hướng dẫn sử dụng"),
+            BotCommand("cancel", "❌ Hủy thao tác hiện tại"),
+        ]
+        
+        await self.application.bot.set_my_commands(commands)
+        logger.info("✅ Bot commands menu ready")
+    
+    async def post_init(self, application: Application):
+        """Callback sau khi application khởi tạo"""
+        await self.set_bot_commands()
     
     def run_polling(self):
         """Chạy bot với polling mode"""
@@ -853,27 +874,26 @@ Cần hỗ trợ? Liên hệ: support@example.com
             return
         
         # Tạo application
-        # Nếu proxy không hoạt động, sử dụng default API
         builder = Application.builder().token(self.bot_token)
         
-        # Thử dùng proxy nếu có, nếu không thì dùng default
+        # Thử dùng proxy nếu có
         if self.api_url and "tele-api" in self.api_url:
-            logger.info(f"Using custom API URL: {self.api_url}")
             builder.base_url(f"{self.api_url}/bot")
-        else:
-            logger.info("Using default Telegram API")
         
-        # Thêm timeout lớn hơn
+        # Timeout
         builder.connect_timeout(30.0)
         builder.read_timeout(30.0)
+        
+        # Post init callback để setup commands
+        builder.post_init(self.post_init)
         
         self.application = builder.build()
         
         # Setup handlers
         self.setup_handlers(self.application)
         
-        # Start polling - run_polling tự quản lý event loop
-        logger.info("🚀 Starting Telegram bot (polling mode)...")
+        # Start polling
+        logger.info("✅ Bot starting...")
         self.application.run_polling()
 
 

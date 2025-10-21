@@ -32,6 +32,8 @@ TELEGRAM_API_URL=https://tele-api.cloudmini.net
 6. Nhấn **Lưu cài đặt**
 7. Quay lại bot và thử các chức năng
 
+> 📖 **Chi tiết:** Xem [TELEGRAM_USER_LINKING.md](./TELEGRAM_USER_LINKING.md) để hiểu cơ chế liên kết tài khoản và hướng dẫn triển khai.
+
 ## Chạy Bot
 
 ### Development (Local)
@@ -134,14 +136,16 @@ tmux attach -t telegram-bot
 
 ### Commands
 
+> 💡 **Tip:** Các commands này cũng xuất hiện trong menu bot khi bạn gõ `/` trong ô chat.
+
 | Command | Mô tả |
 |---------|-------|
-| `/start` | Khởi động bot và xem menu |
-| `/help` | Xem hướng dẫn sử dụng |
-| `/add` | Thêm ghi chú mới |
-| `/list` | Xem danh sách ghi chú |
-| `/upcoming` | Xem ghi chú sắp tới (7 ngày) |
-| `/cancel` | Hủy thao tác hiện tại |
+| `/start` | 🚀 Khởi động bot và xem menu |
+| `/help` | ❓ Xem hướng dẫn sử dụng |
+| `/add` | ➕ Thêm ghi chú mới |
+| `/list` | 📋 Xem danh sách ghi chú |
+| `/upcoming` | ⏰ Xem ghi chú sắp tới (7 ngày) |
+| `/cancel` | ❌ Hủy thao tác hiện tại |
 
 ### Menu Chính
 

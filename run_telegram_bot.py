@@ -7,12 +7,16 @@ import logging
 from app.services.telegram_bot_handler import TelegramBotHandler
 from app.config import settings
 
-# Setup logging
+# Setup logging - Giảm log cho gọn
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+# Tắt httpx debug logs
+logging.getLogger('httpx').setLevel(logging.WARNING)
+logging.getLogger('telegram').setLevel(logging.WARNING)
 
 
 def main():
@@ -23,9 +27,6 @@ def main():
         logger.error("❌ TELEGRAM_BOT_TOKEN not configured in .env file!")
         logger.error("Please add TELEGRAM_BOT_TOKEN=your_token_here to .env")
         return
-    
-    logger.info(f"📱 Bot Token: {settings.telegram_bot_token[:10]}...")
-    logger.info(f"🌐 API URL: {settings.telegram_api_url}")
     
     # Create and run bot
     bot_handler = TelegramBotHandler()
