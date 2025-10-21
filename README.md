@@ -562,6 +562,7 @@ Nếu gặp vấn đề, vui lòng:
 
 ---
 
-**Phát triển bởi:** [Tên của bạn]  
-**Email:** your-email@example.com  
+**Phát triển bởi:** Minh Hưng  
+**Email:** support@minhhungtsbd.me  
+**Website:** https://calendar.minhhungtsbd.me  
 **Version:** 1.0.0

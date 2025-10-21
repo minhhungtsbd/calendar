@@ -449,9 +449,8 @@ A: Vào web Settings, xóa ID cũ và nhập ID mới.
 ## Support
 
 Gặp vấn đề? Liên hệ:
-- 📧 Email: support@example.com
-- 🌐 Website: https://your-domain.com
-- 💬 Telegram: @your_support_username
+- 📧 Email: support@minhhungtsbd.me
+- 🌐 Website: https://calendar.minhhungtsbd.me
 
 ---
 

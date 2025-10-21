@@ -133,12 +133,12 @@ Chọn chức năng từ menu bên dưới:
 • Chọn "✏️ Sửa" hoặc "🗑️ Xóa"
 
 <b>Liên kết tài khoản:</b>
-1. Đăng nhập vào website
+1. Đăng nhập vào website: https://calendar.minhhungtsbd.me/
 2. Vào Cài đặt → Thông báo
 3. Nhập Telegram ID: <code>{}</code>
 4. Lưu cài đặt
 
-Cần hỗ trợ? Liên hệ: support@example.com
+Cần hỗ trợ? Liên hệ: support@minhhungtsbd.me
         """
         
         telegram_id = update.effective_user.id
@@ -198,7 +198,7 @@ Cần hỗ trợ? Liên hệ: support@example.com
                     "❌ <b>Bạn chưa liên kết tài khoản!</b>\n\n"
                     f"📱 Telegram ID của bạn: <code>{update.effective_user.id}</code>\n\n"
                     "Vui lòng:\n"
-                    "1. Đăng nhập vào website\n"
+                    "1. Đăng nhập vào website: https://calendar.minhhungtsbd.me/\n"
                     "2. Vào Cài đặt → Thông báo\n"
                     "3. Nhập Telegram ID ở trên\n"
                     "4. Lưu và quay lại bot",
